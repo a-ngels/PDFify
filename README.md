@@ -16,3 +16,16 @@ Automate filling HIPAA PDF forms with patient data from Excel.
 Install dependencies:
 ```bash
 pip install pandas PyPDF2
+```
+
+## Usage
+1. Save your Excel file as `patients.xlsx`.
+2. Ensure your fillable PDF template is named `hipaa_fillable.pdf`.
+3. Run:
+   ```bash
+   python fill_forms.py
+   ```
+4. PDFs will be created like:
+   ```
+   Jane Doe HIPAA Form.pdf
+   ```
