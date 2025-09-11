@@ -17,6 +17,11 @@ def format_date(value):
       return value.strftime("%m/%d/%Y")
    return str(value)
 
+def safe_str(value):
+   if pd.isna(value):
+      return ""
+   return str(value).strip()
+
 # load excel file
 df_preview = pd.read_excel(excel_file, nrows=1)
 if df_preview.columns[0] == "Table 1":
@@ -41,48 +46,48 @@ for i, row in df.iterrows():
 
    # set text fields
    data = {
-      "Name": str(row.get("PatientName", "")),
+      "Name": safe_str(row.get("PatientName")),
       "Date": format_date(row.get("DOB")),
-      "Address": str(row.get("PatientAddress", "")),
-      "Provider Name": str(row.get("Provider", "")),
-      "Receipient Name": str(row.get("Recipient", "")),
+      "Address": safe_str(row.get("PatientAddress")),
+      "Provider Name": safe_str(row.get("Provider")),
+      "Receipient Name": safe_str(row.get("Recipient")),
       "From Date": format_date(row.get("FromDate")),
       "To Date": format_date(row.get("ToDate")),
-      "Other Text": str(row.get("Sec9_text", "")),     # Sec 9 text
-      "Event": str(row.get("ExpireEvent", "")),
-      "Other Name": str(row.get("SignerName", "")),
-      "Authority": str(row.get("Authority", "")),
-      "Other 2": str(row.get("Sec10_text", "")),       # Sec 10 text
+      "Other Text": safe_str(row.get("Sec9_text")),     # Sec 9 text
+      "Event": safe_str(row.get("ExpireEvent")),
+      "Other Name": safe_str(row.get("SignerName")),
+      "Authority": safe_str(row.get("Authority")),
+      "Other 2": safe_str(row.get("Sec10_text")),       # Sec 10 text
    }
 
    # Apply text values
    writer.update_page_form_field_values(writer.pages[0], data)
 
-   # --- Explicitly handle checkboxes ---
+   # handle checkboxes
    for annot in writer.pages[0]["/Annots"]:
       obj = annot.get_object()
       field_name = obj.get("/T")
 
       # Section 9
-      if field_name == "Med rec Date" and str(row.get("MedRecDate")).strip().lower() == "yes":
+      if field_name == "Med rec Date" and safe_str(row.get("MedRecDate")).lower() == "yes":
          obj.update({NameObject("/V"): NameObject("/Yes")})
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
-      if field_name == "Entire Med Rec" and str(row.get("EntireMedRec")).strip().lower() == "yes":
+      if field_name == "Entire Med Rec" and safe_str(row.get("EntireMedRec")).lower() == "yes":
          obj.update({NameObject("/V"): NameObject("/Yes")})
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
-      if field_name == "Other" and str(row.get("Sec9_check")).strip().lower() == "yes":
+      if field_name == "Other" and safe_str(row.get("Sec9_check")).lower() == "yes":
          obj.update({NameObject("/V"): NameObject("/Yes")})
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
       # Section 10
-      if field_name == "Request Of" and str(row.get("Sec10_check")).strip().lower() == "yes":
+      if field_name == "Request Of" and safe_str(row.get("Sec10_check")).lower() == "yes":
          obj.update({NameObject("/V"): NameObject("/Yes")})
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
    # save pdf
-   patient_name = str(row.get("PatientName", "")).strip()
+   patient_name = safe_str(row.get("PatientName"))
    output_file = f"{patient_name} HIPAA Form_{i+1}.pdf"
    with open(output_file, "wb") as out:
       writer.write(out)
