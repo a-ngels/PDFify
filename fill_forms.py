@@ -82,7 +82,7 @@ for i, row in df.iterrows():
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
       # Section 10
-      if field_name == "Request Of" and safe_str(row.get("Sec10_check")).lower() == "yes":
+      if field_name == "Other 3" and safe_str(row.get("Sec10_check")).lower() == "yes":
          obj.update({NameObject("/V"): NameObject("/Yes")})
          obj.update({NameObject("/AS"): NameObject("/Yes")})
 
